@@ -63,7 +63,7 @@ class EvaluatorExternalPeriodicPhase
         param_type(pybind11::dict params)
             {
             i = params["i"].cast<int>();
-            s = params["phase"].cast<Scalar>();
+            phase = params["phase"].cast<Scalar>();
             A = params["A"].cast<Scalar>();
             w = params["w"].cast<Scalar>();
             p = params["p"].cast<int>();
