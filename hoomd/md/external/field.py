@@ -83,8 +83,8 @@ class Periodic(Field):
         self._add_typeparam(params)
 
 class PeriodicPhase(Field):
-    """Copy of the periodic potential, but with an additional parameter allowing 
-    you to specify the initial phase of the cosine. Added by Luca Scharrer on 9/18/2023
+    """Redo of the periodic potential, changing it to be a pure cosine, with w 
+    reassigned to be the initial phase. Added by Luca Scharrer on 9/18/2023
 
     `Periodic` computes forces and energies that induce a periodic modulation in
     the particle concentration. The modulation is one-dimensional and extends
@@ -96,8 +96,8 @@ class PeriodicPhase(Field):
 
     .. math::
 
-       U_i(\\vec{r_j}) = A \\tanh\\left[\\frac{1}{2 \\pi p w} \\cos\\left( phase+
-       p \\vec{b}_i\\cdot\\vec{r_j}\\right)\\right]
+       U_i(\\vec{r_j}) = A  \\cos\\left( w +
+       p \\vec{b}_i\\cdot\\vec{r_j}\\right)
 
     `Periodic` results in no virial stress due functional dependence on box
     scaled coordinates.
@@ -107,16 +107,12 @@ class PeriodicPhase(Field):
         The `Periodic` external potential parameters. The dictionary has the
         following keys:
 
-        * ``phase`` (`float`, **required**) - Phase of cosine at origin :math:`phase` \
-            :math:`[\\mathrm{dimensionless}]`.
         * ``A`` (`float`, **required**) - Ordering parameter :math:`A` \
             :math:`[\\mathrm{energy}]`.
         * ``i`` (`int`, **required**) - :math:`\\vec{b}_i`, :math:`i=0, 1, 2`, \
             is the simulation box's reciprocal lattice vector in the :math:`i` \
             direction :math:`[\\mathrm{dimensionless}]`.
-        * ``w`` (`float`, **required**) - The interface width :math:`w` \
-            relative to the distance :math:`2\\pi/|\\mathbf{b_i}|` between \
-            planes in the :math:`i`-direction :math:`[\\mathrm{dimensionless}]`.
+        * ``w`` (`float`, **required**) - Phase of cosine at origin :math:`w` \
         * ``p`` (`int`, **required**) - The periodicity :math:`p` of the \
             modulation :math:`[\\mathrm{dimensionless}]`.
 
@@ -129,12 +125,12 @@ class PeriodicPhase(Field):
         periodic.params['A'] = dict(A=1.0, i=0, w=0.02, p=3, phase=0.0)
         periodic.params['B'] = dict(A=-1.0, i=0, w=0.02, p=3, phase=0.0)
     """
-    _cpp_class_name = "PotentialExternalPeriodic"
+    _cpp_class_name = "PotentialExternalPeriodicPhase"
 
     def __init__(self):
         params = TypeParameter(
             'params', 'particle_types',
-            TypeParameterDict(i=int, phase=float, A=float, w=float, p=int, len_keys=1))
+            TypeParameterDict(i=int, A=float, w=float, p=int, len_keys=1))
         self._add_typeparam(params)
 
 class Electric(Field):
