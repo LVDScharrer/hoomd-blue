@@ -427,7 +427,7 @@ foreach(_evaluator ${_triplets})
     endif()
 endforeach()
 
-set(_external_evaluators Periodic ElectricField)
+set(_external_evaluators Periodic PeriodicPhase ElectricField)
 
 foreach(_evaluator ${_external_evaluators})
     configure_file(export_PotentialExternal.cc.inc
