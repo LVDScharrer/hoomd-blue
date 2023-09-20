@@ -37,7 +37,7 @@ namespace md
     The external potential \f$V(\vec{r}) \f$ is implemented using the following formula:
 
     \f[
-    V(\vec{r}) = A * \tanh\left[\frac{1}{2 \pi p w} \cos\left(p \vec{b}_i\cdot\vec{r}\right)\right]
+    V(\vec{r}) = A * \cos\left(w + p \vec{b}_i\cdot\vec{r}\right)
     \f]
 
     where \f$A\f$ is the ordering parameter, \f$\vec{b}_i\f$ is the reciprocal lattice vector
@@ -51,32 +51,29 @@ class EvaluatorExternalPeriodicPhase
     //! type of parameters this external potential accepts
     struct param_type
         {
-        Scalar phase;
         Scalar A;
         Scalar w;
         int i;
         int p;
 
 #ifndef __HIPCC__
-        param_type() : phase(0.0), A(1.0), w(1.0), i(0), p(1) { }
+        param_type() : A(1.0), w(0.0), i(0), p(1) { }
 
         param_type(pybind11::dict params)
             {
             i = params["i"].cast<int>();
-            phase = params["phase"].cast<Scalar>();
             A = params["A"].cast<Scalar>();
             w = params["w"].cast<Scalar>();
             p = params["p"].cast<int>();
             }
 
-        param_type(int i_, Scalar phase_, Scalar A_, Scalar w_, int p_) : phase(phase_), A(A_), w(w_), i(i_), p(p_) { }
+        param_type(int i_, Scalar A_, Scalar w_, int p_) : A(A_), w(w_), i(i_), p(p_) { }
 
         pybind11::dict toPython()
             {
             pybind11::dict d;
             d["i"] = i;
             d["A"] = A;
-            d["phase"] = phase;
             d["w"] = w;
             d["p"] = p;
             return d;
@@ -95,8 +92,8 @@ class EvaluatorExternalPeriodicPhase
                                      const BoxDim& box,
                                      const param_type& params,
                                      const field_type& field)
-        : m_pos(X), m_box(box), m_index(params.i), m_phase(params.phase), m_orderParameter(params.A),
-          m_interfaceWidth(params.w), m_periodicity(params.p)
+        : m_pos(X), m_box(box), m_index(params.i), m_orderParameter(params.A),
+          m_phase(params.w), m_periodicity(params.p)
         {
         }
 
@@ -160,17 +157,18 @@ class EvaluatorExternalPeriodicPhase
                                    a2.z * a3.x - a2.x * a3.z,
                                    a2.x * a3.y - a2.y * a3.x)
                     / V_box;
-        Scalar clipParameter, arg, clipcos, tanH, sechSq;
+        Scalar arg;
+        // Scalar clipParameter, arg, clipcos, tanH, sechSq;
 
         Scalar3 q = b * m_periodicity;
-        clipParameter = Scalar(1.0) / Scalar(2.0 * M_PI) / (m_periodicity * m_interfaceWidth);
+        // clipParameter = Scalar(1.0) / Scalar(2.0 * M_PI) / (m_periodicity * m_interfaceWidth);
         arg = m_phase + dot(m_pos, q);
-        clipcos = clipParameter * fast::cos(arg);
-        tanH = slow::tanh(clipcos);
-        sechSq = (Scalar(1.0) - tanH * tanH);
+        // clipcos = clipParameter * fast::cos(arg);
+        // tanH = slow::tanh(clipcos);
+        // sechSq = (Scalar(1.0) - tanH * tanH);
 
-        F = m_orderParameter * sechSq * clipParameter * fast::sin(arg) * q;
-        energy = m_orderParameter * tanH;
+        F = m_orderParameter * fast::sin(arg) * q;
+        energy = m_orderParameter * fast::cos(arg);
         }
 
 #ifndef __HIPCC__
@@ -189,7 +187,7 @@ class EvaluatorExternalPeriodicPhase
     unsigned int m_index; //!< cartesian index of direction along which the lamellae should be oriented
     Scalar m_orderParameter;    //!< ordering parameter
     Scalar m_phase;    //!< phase of cosine at origin
-    Scalar m_interfaceWidth;    //!< width of interface between lamellae (relative to box length)
+    // Scalar m_interfaceWidth;    //!< width of interface between lamellae (relative to box length)
     unsigned int m_periodicity; //!< number of lamellae of each type
     };
 
