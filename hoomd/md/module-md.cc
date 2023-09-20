@@ -87,6 +87,7 @@ void export_PotentialSquareDensity(pybind11::module& m);
 void export_PotentialRevCross(pybind11::module& m);
 
 void export_PotentialExternalPeriodic(pybind11::module& m);
+void export_PotentialExternalPeriodicPhase(pybind11::module& m);
 void export_PotentialExternalElectricField(pybind11::module& m);
 
 void export_PotentialExternalWallLJ(pybind11::module& m);
@@ -229,6 +230,7 @@ void export_PotentialSquareDensityGPU(pybind11::module& m);
 void export_PotentialRevCrossGPU(pybind11::module& m);
 
 void export_PotentialExternalPeriodicGPU(pybind11::module& m);
+void export_PotentialExternalPeriodicPhaseGPU(pybind11::module& m);
 void export_PotentialExternalElectricFieldGPU(pybind11::module& m);
 
 void export_PotentialExternalWallLJGPU(pybind11::module& m);
@@ -368,6 +370,7 @@ PYBIND11_MODULE(_md, m)
     export_LocalNeighborListDataHost(m);
 
     export_PotentialExternalPeriodic(m);
+    export_PotentialExternalPeriodicPhase(m);
     export_PotentialExternalElectricField(m);
 
     export_wall_data(m);
@@ -456,6 +459,7 @@ PYBIND11_MODULE(_md, m)
     export_ActiveForceConstraintComputeSphereGPU(m);
     export_ConstantForceComputeGPU(m);
     export_PotentialExternalPeriodicGPU(m);
+    export_PotentialExternalPeriodicPhaseGPU(m);
     export_PotentialExternalElectricFieldGPU(m);
 
     export_PotentialExternalWallLJGPU(m);
